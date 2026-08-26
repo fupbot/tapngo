@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap");
+@import "tailwindcss";
+
+/* "Kiosk Fresh" design tokens — see ARCHITECTURE_DECISIONS.md section 2.4 */
+@theme {
+  --font-display: "Poppins", ui-rounded, "Segoe UI", system-ui, sans-serif;
+
+  --color-brand-teal: #0d9488;
+  --color-brand-teal-dark: #115e59;
+  --color-brand-teal-light: #ccfbf1;
+
+  --color-brand-orange: #f97316;
+  --color-brand-orange-dark: #ea580c;
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-ink: #0f172a;
+  --color-ink-muted: #64748b;
+  --color-danger: #dc2626;
+}
+
+html {
+  font-family: var(--font-display);
+  /* Kiosk tablet: no pinch-zoom / double-tap-zoom gestures. */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  background: var(--color-surface-muted);
+  color: var(--color-ink);
+}
+
+/* Kiosk touch targets stay >48px — see ARCHITECTURE_DECISIONS.md section 2.2 */
+button {
+  min-height: 48px;
+  min-width: 48px;
+}
