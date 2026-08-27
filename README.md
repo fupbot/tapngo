@@ -43,6 +43,12 @@ docker compose up --build
 
 Access the kiosk interface at `http://localhost` (API endpoints accessible at `http://localhost/api/v1/`).
 
+If port 80 is already taken on your machine, pick a different one with `FRONTEND_PORT`:
+```bash
+FRONTEND_PORT=8080 docker compose up --build
+```
+then open `http://localhost:8080` instead.
+
 ### Run locally without Docker
 
 **Backend** (Terminal 1):

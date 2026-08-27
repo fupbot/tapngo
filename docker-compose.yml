@@ -13,7 +13,11 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "80:80"
+      # 80 by default, so `docker compose up --build` still needs zero
+      # config for the common case — but overridable in one env var if
+      # something else already owns port 80 on the host, e.g.:
+      #   FRONTEND_PORT=8080 docker compose up --build
+      - "${FRONTEND_PORT:-80}:80"
     depends_on:
       - backend
 
