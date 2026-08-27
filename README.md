@@ -18,7 +18,7 @@ A modern, touch-first checkout web application and API engineered for quick-serv
 * **Idle Cart Reset:** Automatic 15-second inactivity timer launches a 15-second visual prompt (*"Are you there?"*). Unanswered countdowns automatically clear session data and reset to the landing screen.
 * **Order Confirmation Cycle:** Completed transactions display an Order # confirmation screen for **3 seconds** before returning to the initial *"ORDER HERE"* state for the next customer.
 * **Double-Tap & Concurrency Safety:** Single-touch gesture limits and immediate button state locks prevent accidental bulk additions or duplicate API submissions. Backend timestamp order resolves simultaneous last-item purchases cleanly.
-* **Pluggable Payment Gateway & Admin Controls:** Pluggable `PaymentService` architecture supporting Credit Card (Tap/Chip), Apple Pay / Google Pay, and Store Card. Includes an admin debug control panel to inject card declines and server error conditions for error handling verification.
+* **Pluggable Payment Gateway & Admin Controls:** Pluggable `PaymentProcessor` architecture supporting Credit Card (Tap/Chip), Apple Pay / Google Pay, and Store Card. Includes an admin debug control panel to inject card declines and server error conditions for error handling verification.
 * **Minimalist "Trailhead" UI/UX:** A calm, café-at-a-trailhead visual identity — forest green and clay/terracotta on warm cream, Fraunces + Inter typography, and hand-drawn line icons in place of emoji. Layout patterns still informed by [qomander](https://github.com/aBrihoum/qomander).
 
 ---

@@ -2,6 +2,8 @@
 
 This document provides a chronologically structured log of the steps, trade-offs, and decisions taken during the design and development of the **TapNGo** self-service kiosk system.
 
+Steps 1–7 were drafted as the original plan before any code existed. Where reality diverged from that plan, later entries correct the specific claim rather than silently rewriting history — Steps 4, 7, and 8 each carry a note pointing to where the actual implementation is described.
+
 ---
 
 ## High-Level Step-by-Step Log
@@ -22,12 +24,11 @@ This document provides a chronologically structured log of the steps, trade-offs
   * Implemented database dynamic seeding script (`seed.py`) to initialize default product catalog items with starting stock levels.
 
 * **Step 4: Backend API & Service Layer Implementation**
-  * Implemented RESTful API endpoints for catalog browsing (`/api/v1/products`), order creation (`/api/v1/orders`), and payment execution (`/api/v1/payments`).
-  * Integrated atomic transaction handling and dynamic inventory decrement checks during checkout.
-  * Added concurrency protection using payment timestamp ordering to resolve simultaneous stock claims cleanly.
+  * Planned RESTful API endpoints for catalog browsing and order creation.
+  * **Correction (plan vs. actual, see Step 10):** this entry originally listed a separate `/api/v1/payments` endpoint and "payment timestamp ordering" for concurrency — neither was actually built. Payment ended up as `POST /api/v1/orders/{id}/pay` (part of the orders resource, not its own), and concurrency is handled by a single atomic stock-decrement statement, not timestamp comparison (see Step 9 and `ARCHITECTURE_DECISIONS.md` section 3 for why the timestamp approach was dropped before implementation).
 
 * **Step 5: Payment Service Abstraction & Admin Failure Controls**
-  * Created pluggable `PaymentService` strategy abstraction supporting Credit Card (tap/chip), Mobile Pay (Apple/Google Pay), and Store Card.
+  * Created a pluggable `PaymentProcessor` strategy abstraction (`app/services/payment.py`) supporting Credit Card (tap/chip), Mobile Pay (Apple/Google Pay), and Store Card.
   * Implemented lightweight authentication separating regular kiosk clients (`kiosk1`, `kiosk2`, `kiosk3`) from `admin` users.
   * Built an admin failure injection mechanism enabling forced payment declines, timeouts, or backend error simulation for UI resilience verification.
 
@@ -36,10 +37,8 @@ This document provides a chronologically structured log of the steps, trade-offs
   * Implemented automatic **15-second idle detection** triggering a 15-second modal countdown prompt ("Are you there?") before resetting to the home screen.
   * Added a **3-second order confirmation banner** display before returning to the initial "ORDER HERE" state for subsequent customers.
 
-* **Step 7: Containerization & Reverse Proxy Setup**
-  * Created multi-stage `Dockerfile` for backend Uvicorn application and frontend Vite React build.
-  * Configured NGINX reverse proxy to serve frontend SPA routes while routing `/api/*` to FastAPI application seamlessly.
-  * Authored `docker-compose.yml` for single-command environment bootstrapping (`docker compose up --build`).
+* **Step 7: Containerization & Reverse Proxy Setup (planned here — actually built in Step 19)**
+  * Planned a multi-stage Dockerfile for the backend, an NGINX-served frontend build reverse-proxying `/api/*`, and a `docker-compose.yml` for single-command startup. This was the target architecture from the start, but implementation didn't happen until Step 19, after the app itself was built, tested, and working — see that entry for what was actually created and how it was verified.
 
 * **Step 8: Testing & Verification (original plan — see Step 18 for what was actually built)**
   * At this point in the project, testing was still a forward-looking plan, not yet implemented — matching the earlier decision to write tests last rather than test-first. This entry described the intended scope before any test file existed.
@@ -52,7 +51,7 @@ This document provides a chronologically structured log of the steps, trade-offs
     * **Admin access:** Specified how an admin actually reaches the debug/failure-injection panel without the customer flow ever showing a login prompt — a discreet long-press gesture on a small header element, kept out of the normal tap path.
     * **Failure handling scope:** Extended beyond admin-forced failures to cover real unprompted failures (dropped network, timeout, unexpected 500) with one consistent client-side error/retry pattern.
     * **Cut branded physical collateral** (cup/wrapper mockups) — graphic design effort that doesn't demonstrate engineering judgment; kept the color palette and wordmark only.
-    * **Folded the requirements-elicitation Q&A into this log and the ADR** rather than keeping the raw transcript as a separate file, so the repo reads as project documentation rather than an interview artifact.
+    * **Folded the requirements-elicitation Q&A into this log and the ADR** rather than keeping the raw transcript as a separate file — the substance belongs in the decision records; a standalone Q&A transcript would just duplicate it.
 
 * **Step 10: Backend Implementation**
   * Created a Python 3.12 venv at `backend/venv` and pinned dependencies (`fastapi`, `uvicorn`, `sqlalchemy>=2.0`, `pydantic`, `pydantic-settings`) to `requirements.txt`.

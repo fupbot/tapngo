@@ -71,7 +71,7 @@ Requirements below were shaped through a structured requirements-elicitation pas
 ## 4. Payment Abstraction & Failure Injection
 
 ### 4.1 Payment Strategy Interface
-* To decouple payment hardware or third-party processor details, the backend exposes a pluggable `PaymentService` strategy interface (`IPaymentProcessor`).
+* To decouple payment hardware or third-party processor details, the backend exposes a pluggable `PaymentProcessor` strategy abstraction (`app/services/payment.py`) — an ABC with one implementation per method, selected via a small factory function.
 * Supports realistic simulated payment rails without live processing:
   * Credit Card (Tap / Chip Insert)
   * Apple Pay & Google Pay
