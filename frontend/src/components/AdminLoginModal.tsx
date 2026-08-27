@@ -27,36 +27,36 @@ export function AdminLoginModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-6">
-      <div className="w-full max-w-xs rounded-3xl bg-surface p-6 shadow-2xl">
-        <p className="font-display text-lg font-bold text-ink">Staff sign-in</p>
+      <div className="w-full max-w-xs rounded-2xl bg-surface p-6 shadow-lg">
+        <p className="font-display text-lg font-semibold text-ink">Staff sign-in</p>
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
           <input
             autoFocus
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="rounded-xl border border-slate-200 px-4 py-3 text-base"
+            className="rounded-lg border border-stone-200 px-4 py-3 text-base"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-xl border border-slate-200 px-4 py-3 text-base"
+            className="rounded-lg border border-stone-200 px-4 py-3 text-base"
           />
           {error && <p className="text-sm text-danger">{error}</p>}
           <div className="mt-2 flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl bg-surface-muted px-4 py-3 font-semibold text-ink-muted"
+              className="flex-1 rounded-lg bg-surface-muted px-4 py-3 font-semibold text-ink-muted"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 rounded-xl bg-brand-teal px-4 py-3 font-semibold text-white disabled:opacity-60"
+              className="flex-1 rounded-lg bg-brand-forest px-4 py-3 font-semibold text-white disabled:opacity-60"
             >
               {submitting ? "Signing in…" : "Sign in"}
             </button>

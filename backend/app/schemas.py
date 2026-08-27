@@ -29,7 +29,6 @@ class ProductOut(BaseModel):
     name: str
     description: str
     category: str
-    emoji: str
     price_cents: int
     stock: int
     active: bool
@@ -47,7 +46,13 @@ class ProductOut(BaseModel):
 
 class OrderItemIn(BaseModel):
     product_id: int
-    quantity: int = Field(gt=0, le=20)
+    # Generous sanity ceiling only — rejects obviously-garbage payloads before
+    # they reach business logic. The real per-item limit (5, or current stock
+    # if lower) is enforced in routers/orders.py with a friendly message,
+    # since FastAPI's default validation-error shape (a list of error
+    # objects) isn't something the client should have to parse to show a
+    # readable error.
+    quantity: int = Field(gt=0, le=99)
 
 
 class OrderCreateRequest(BaseModel):
@@ -80,6 +85,9 @@ class OrderOut(BaseModel):
     created_at: datetime
     paid_at: datetime | None
     cancelled_reason: str | None
+    # Only the client that created the order ever sees this (returned once
+    # at creation, then required back as X-Order-Token on later requests).
+    access_token: str
 
     model_config = {"from_attributes": True}
 

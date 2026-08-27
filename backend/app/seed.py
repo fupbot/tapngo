@@ -20,23 +20,23 @@ USERS = [
 
 PRODUCTS = [
     # Drinks
-    {"name": "Cola", "category": "Drinks", "emoji": "🥤", "price_cents": 250, "stock": 40},
-    {"name": "Sparkling Water", "category": "Drinks", "emoji": "🫧", "price_cents": 200, "stock": 30},
-    {"name": "Iced Tea", "category": "Drinks", "emoji": "🧊", "price_cents": 275, "stock": 25},
-    {"name": "Orange Juice", "category": "Drinks", "emoji": "🍊", "price_cents": 300, "stock": 20},
+    {"name": "Cola", "category": "Drinks", "price_cents": 250, "stock": 40},
+    {"name": "Sparkling Water", "category": "Drinks", "price_cents": 200, "stock": 30},
+    {"name": "Iced Tea", "category": "Drinks", "price_cents": 275, "stock": 25},
+    {"name": "Orange Juice", "category": "Drinks", "price_cents": 300, "stock": 20},
     # Snacks
-    {"name": "Potato Chips", "category": "Snacks", "emoji": "🥔", "price_cents": 275, "stock": 50},
-    {"name": "Pretzel", "category": "Snacks", "emoji": "🥨", "price_cents": 250, "stock": 40},
-    {"name": "Popcorn", "category": "Snacks", "emoji": "🍿", "price_cents": 300, "stock": 35},
-    {"name": "Trail Mix", "category": "Snacks", "emoji": "🥜", "price_cents": 325, "stock": 25},
+    {"name": "Potato Chips", "category": "Snacks", "price_cents": 275, "stock": 50},
+    {"name": "Pretzel", "category": "Snacks", "price_cents": 250, "stock": 40},
+    {"name": "Popcorn", "category": "Snacks", "price_cents": 300, "stock": 35},
+    {"name": "Trail Mix", "category": "Snacks", "price_cents": 325, "stock": 25},
     # Hot Food
-    {"name": "Hot Dog", "category": "Hot Food", "emoji": "🌭", "price_cents": 450, "stock": 20},
-    {"name": "Nachos", "category": "Hot Food", "emoji": "🧀", "price_cents": 500, "stock": 0},
-    {"name": "Pizza Slice", "category": "Hot Food", "emoji": "🍕", "price_cents": 475, "stock": 18},
+    {"name": "Hot Dog", "category": "Hot Food", "price_cents": 450, "stock": 20},
+    {"name": "Nachos", "category": "Hot Food", "price_cents": 500, "stock": 0},
+    {"name": "Pizza Slice", "category": "Hot Food", "price_cents": 475, "stock": 18},
     # Desserts
-    {"name": "Chocolate Bar", "category": "Desserts", "emoji": "🍫", "price_cents": 275, "stock": 30},
-    {"name": "Cookie", "category": "Desserts", "emoji": "🍪", "price_cents": 225, "stock": 40},
-    {"name": "Ice Cream Cup", "category": "Desserts", "emoji": "🍦", "price_cents": 350, "stock": 15},
+    {"name": "Chocolate Bar", "category": "Desserts", "price_cents": 275, "stock": 30},
+    {"name": "Cookie", "category": "Desserts", "price_cents": 225, "stock": 40},
+    {"name": "Ice Cream Cup", "category": "Desserts", "price_cents": 350, "stock": 15},
 ]
 
 

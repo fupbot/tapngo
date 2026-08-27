@@ -19,7 +19,7 @@ A modern, touch-first checkout web application and API engineered for quick-serv
 * **Order Confirmation Cycle:** Completed transactions display an Order # confirmation screen for **3 seconds** before returning to the initial *"ORDER HERE"* state for the next customer.
 * **Double-Tap & Concurrency Safety:** Single-touch gesture limits and immediate button state locks prevent accidental bulk additions or duplicate API submissions. Backend timestamp order resolves simultaneous last-item purchases cleanly.
 * **Pluggable Payment Gateway & Admin Controls:** Pluggable `PaymentService` architecture supporting Credit Card (Tap/Chip), Apple Pay / Google Pay, and Store Card. Includes an admin debug control panel to inject card declines and server error conditions for error handling verification.
-* **Minimalist "Kiosk Fresh" UI/UX:** Clean design language inspired by ['tap' (faucet) / 'go' (motion)](https://github.com/aBrihoum/qomander) featuring rounded bold typography, "Cool Water" Teal, and high-contrast "Energetic Orange" primary CTAs.
+* **Minimalist "Trailhead" UI/UX:** A calm, café-at-a-trailhead visual identity — forest green and clay/terracotta on warm cream, Fraunces + Inter typography, and hand-drawn line icons in place of emoji. Layout patterns still informed by [qomander](https://github.com/aBrihoum/qomander).
 
 ---
 
@@ -43,16 +43,54 @@ docker compose up --build
 
 Access the kiosk interface at `http://localhost` (API endpoints accessible at `http://localhost/api/v1/`).
 
+### Run locally without Docker
+
+**Backend** (Terminal 1):
+```bash
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+```
+The first run auto-creates and seeds the SQLite database. API docs at `http://localhost:8000/docs`.
+
+**Frontend** (Terminal 2):
+```bash
+cd frontend
+npm install   # first time only
+npm run dev
+```
+Open the printed URL (`http://localhost:5173`). The Vite dev server proxies `/api/*` to the backend, so both must be running.
+
+### Seeded Users
+
+| Username | Password | Role |
+|---|---|---|
+| `admin` | `admin123` | admin — unlocks the payment-page debug panel (force decline/timeout/server error) via a long-press on the small dot in the header's top-right corner |
+| `kiosk1` | `kiosk123` | kiosk |
+| `kiosk2` | `kiosk123` | kiosk |
+| `kiosk3` | `kiosk123` | kiosk |
+
+Regular ordering doesn't require signing in — these credentials only matter for reaching the admin debug panel.
+
 ---
 
 ## 🧪 Testing
 
-### Backend Unit & Integration Tests
+A small, deliberately non-exhaustive suite covering the core business logic — not maximum coverage.
+
+### Backend Unit Tests
 ```bash
+cd backend
+source venv/bin/activate
+pip install -r requirements-dev.txt   # first time only — adds pytest + httpx
 pytest
 ```
+Covers order creation and its quantity cap, the atomic stock decrement on payment (including the insufficient-stock/rollback path), the order-access-token check, admin-only failure injection, cancel/refund state rules, and login. Each test runs against an isolated temp-file SQLite DB (see `tests/conftest.py`) — never the real dev database.
 
-### Frontend Component Tests
+### Frontend Unit Tests
 ```bash
+cd frontend
+npm install   # first time only
 npm run test
 ```
+Covers the cart's per-item quantity cap (`SessionContext`) and the API client's error-message parsing (`lib/api.ts`) — including a regression test for a real bug hit during development, where a FastAPI validation error rendered as literal `[object Object]` on screen.

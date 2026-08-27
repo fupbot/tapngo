@@ -1,4 +1,5 @@
 import enum
+import secrets
 from datetime import datetime
 
 from sqlalchemy import Enum as SAEnum
@@ -52,7 +53,6 @@ class Product(Base):
     name: Mapped[str]
     description: Mapped[str] = mapped_column(default="")
     category: Mapped[str] = mapped_column(default="")
-    emoji: Mapped[str] = mapped_column(default="")
     price_cents: Mapped[int]
     stock: Mapped[int]
     active: Mapped[bool] = mapped_column(default=True)
@@ -66,6 +66,12 @@ class Order(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     status: Mapped[OrderStatus] = mapped_column(
         SAEnum(OrderStatus), default=OrderStatus.PENDING
+    )
+    # Whoever creates the order gets this back and must present it on every
+    # later lookup/pay/cancel for it — otherwise order IDs (sequential ints)
+    # would let any customer view or act on any other customer's order.
+    access_token: Mapped[str] = mapped_column(
+        unique=True, default=lambda: secrets.token_urlsafe(16)
     )
     kiosk_username: Mapped[str | None] = mapped_column(default=None)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())

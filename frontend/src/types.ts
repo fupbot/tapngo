@@ -5,7 +5,6 @@ export interface Product {
   name: string
   description: string
   category: string
-  emoji: string
   price_cents: number
   stock: number
   active: boolean
@@ -34,6 +33,7 @@ export interface Order {
   created_at: string
   paid_at: string | null
   cancelled_reason: string | null
+  access_token: string
 }
 
 export interface PayResponse {

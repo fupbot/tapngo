@@ -1,26 +1,31 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-/* "Kiosk Fresh" design tokens — see ARCHITECTURE_DECISIONS.md section 2.4 */
+/* "Trailhead" design tokens — a trailhead café: forest green, clay/terracotta,
+   warm neutrals. See ARCHITECTURE_DECISIONS.md section 2.4. */
 @theme {
-  --font-display: "Poppins", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand-teal: #0d9488;
-  --color-brand-teal-dark: #115e59;
-  --color-brand-teal-light: #ccfbf1;
+  --color-brand-forest: #37503f;
+  --color-brand-forest-dark: #24352a;
+  --color-brand-forest-light: #e7ebe2;
 
-  --color-brand-orange: #f97316;
-  --color-brand-orange-dark: #ea580c;
+  --color-brand-clay: #b5652d;
+  --color-brand-clay-dark: #8f4f23;
+  --color-brand-clay-light: #f3e6d8;
 
-  --color-surface: #ffffff;
-  --color-surface-muted: #f8fafc;
-  --color-ink: #0f172a;
-  --color-ink-muted: #64748b;
-  --color-danger: #dc2626;
+  --color-surface: #fdfbf6;
+  --color-surface-muted: #f3eee3;
+  --color-ink: #2b2620;
+  --color-ink-muted: #7c7263;
+
+  --color-danger: #a3402c;
+  --color-danger-light: #f5e3dc;
 }
 
 html {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   /* Kiosk tablet: no pinch-zoom / double-tap-zoom gestures. */
   touch-action: manipulation;
   -webkit-user-select: none;

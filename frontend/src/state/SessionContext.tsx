@@ -22,18 +22,27 @@ interface SessionValue {
 
 const SessionContext = createContext<SessionValue | null>(null)
 
+// Keep in sync with MAX_QUANTITY_PER_ITEM in backend/app/routers/orders.py.
+// Enforced here (inside the state updater, not just a disabled button) so a
+// rapid-fire double-tap can't sneak past a stale render before React
+// re-disables the button — the whole point of a kiosk's double-tap guard.
+export const MAX_QUANTITY_PER_ITEM = 5
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartLine[]>([])
   const [admin, setAdmin] = useState<AdminSession | null>(null)
 
   const addToCart = useCallback((product: Product) => {
     setCart((prev) => {
+      const cap = Math.min(MAX_QUANTITY_PER_ITEM, product.stock)
       const existing = prev.find((line) => line.product.id === product.id)
       if (existing) {
+        if (existing.quantity >= cap) return prev
         return prev.map((line) =>
           line.product.id === product.id ? { ...line, quantity: line.quantity + 1 } : line,
         )
       }
+      if (cap <= 0) return prev
       return [...prev, { product, quantity: 1 }]
     })
   }, [])

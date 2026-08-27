@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
 import { ApiError, fetchProducts } from "@/lib/api"
-import { useSession } from "@/state/SessionContext"
+import { categoryForSlug } from "@/lib/categories"
+import { PRODUCT_ICONS } from "@/lib/productIcons"
+import { MAX_QUANTITY_PER_ITEM, useSession } from "@/state/SessionContext"
 import type { Product } from "@/types"
 
 function formatPrice(cents: number) {
@@ -11,28 +13,25 @@ function formatPrice(cents: number) {
 
 export function MenuPage() {
   const navigate = useNavigate()
+  const { category: categorySlug } = useParams<{ category: string }>()
+  const category = categoryForSlug(categorySlug)
   const { cart, cartCount, cartTotalCents, addToCart, setQuantity } = useSession()
   const [products, setProducts] = useState<Product[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!category) {
+      navigate("/menu", { replace: true })
+      return
+    }
     fetchProducts()
       .then(setProducts)
       .catch((err) => setError(err instanceof ApiError ? err.message : "Couldn't load the menu."))
-  }, [])
-
-  const categories = useMemo(() => {
-    if (!products) return []
-    const byCategory = new Map<string, Product[]>()
-    for (const product of products) {
-      const list = byCategory.get(product.category) ?? []
-      list.push(product)
-      byCategory.set(product.category, list)
-    }
-    return [...byCategory.entries()]
-  }, [products])
+  }, [category, navigate])
 
   const quantityInCart = (productId: number) => cart.find((line) => line.product.id === productId)?.quantity ?? 0
+
+  if (!category) return null
 
   if (error) {
     return (
@@ -41,7 +40,7 @@ export function MenuPage() {
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="rounded-xl bg-brand-teal px-6 py-3 font-semibold text-white"
+          className="rounded-xl bg-brand-forest px-6 py-3 font-semibold text-white"
         >
           Try again
         </button>
@@ -49,53 +48,74 @@ export function MenuPage() {
     )
   }
 
+  const items = products?.filter((p) => p.category === category.label) ?? null
+  const CategoryIcon = category.icon
+
   return (
     <div className="flex flex-1 flex-col pb-28">
       <div className="flex-1 overflow-y-auto px-6 py-6">
-        {!products && <p className="text-ink-muted">Loading menu…</p>}
+        <button
+          type="button"
+          onClick={() => navigate("/menu")}
+          className="mb-4 flex items-center gap-1 font-semibold text-ink-muted"
+        >
+          <span aria-hidden="true">←</span> Categories
+        </button>
 
-        {categories.map(([category, items]) => (
-          <section key={category} className="mb-8">
-            <h2 className="mb-3 font-display text-xl font-bold text-ink">{category}</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {items.map((product) => {
-                const inCart = quantityInCart(product.id)
-                return (
-                  <button
-                    key={product.id}
-                    type="button"
-                    disabled={!product.in_stock}
-                    onClick={() => addToCart(product)}
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-surface p-4 text-center shadow-sm transition active:scale-[0.97] disabled:opacity-40"
-                  >
-                    <span className="text-4xl">{product.emoji}</span>
-                    <span className="font-semibold text-ink">{product.name}</span>
-                    <span className="text-brand-teal-dark">{formatPrice(product.price_cents)}</span>
-                    {!product.in_stock && <span className="text-xs font-semibold text-danger">Sold out</span>}
-                    {inCart > 0 && (
-                      <span className="rounded-full bg-brand-orange px-2 py-0.5 text-xs font-bold text-white">
-                        {inCart} in cart
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </section>
-        ))}
+        <div className="mb-5 flex items-center gap-2 text-brand-forest-dark">
+          <CategoryIcon className="h-6 w-6" />
+          <h1 className="font-display text-xl font-semibold uppercase tracking-wide">{category.label}</h1>
+        </div>
+
+        {!items && <p className="text-ink-muted">Loading menu…</p>}
+
+        {items && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {items.map((product) => {
+              const inCart = quantityInCart(product.id)
+              const cap = Math.min(MAX_QUANTITY_PER_ITEM, product.stock)
+              const atLimit = product.in_stock && inCart >= cap
+              const ItemIcon = PRODUCT_ICONS[product.name] ?? category.icon
+              return (
+                <button
+                  key={product.id}
+                  type="button"
+                  disabled={!product.in_stock || atLimit}
+                  onClick={() => addToCart(product)}
+                  className="flex flex-col items-center gap-1 rounded-xl border border-stone-200 bg-surface p-4 text-center transition active:scale-[0.97] disabled:opacity-40"
+                >
+                  <ItemIcon className="h-8 w-8 text-brand-forest-dark" />
+                  <span className="mt-1 font-medium text-ink">{product.name}</span>
+                  <span className="text-sm text-ink-muted">{formatPrice(product.price_cents)}</span>
+                  {!product.in_stock && (
+                    <span className="text-xs font-semibold uppercase tracking-wide text-danger">Sold out</span>
+                  )}
+                  {atLimit && (
+                    <span className="text-xs font-semibold uppercase tracking-wide text-danger">Limit reached</span>
+                  )}
+                  {inCart > 0 && (
+                    <span className="rounded-full bg-brand-clay px-2 py-0.5 text-xs font-semibold text-white">
+                      {inCart} in cart
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-slate-100 bg-surface p-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+      <div className="fixed inset-x-0 bottom-0 border-t border-stone-200 bg-surface p-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <div>
             <p className="text-sm text-ink-muted">{cartCount} item{cartCount === 1 ? "" : "s"}</p>
-            <p className="font-display text-xl font-bold text-ink">{formatPrice(cartTotalCents)}</p>
+            <p className="font-display text-xl font-semibold text-ink">{formatPrice(cartTotalCents)}</p>
           </div>
           <button
             type="button"
             disabled={cartCount === 0}
             onClick={() => navigate("/payment")}
-            className="rounded-2xl bg-brand-orange px-8 py-4 text-lg font-bold text-white shadow-lg disabled:opacity-40"
+            className="rounded-xl bg-brand-clay px-8 py-4 text-lg font-semibold text-white shadow-sm disabled:opacity-40"
           >
             Checkout
           </button>
@@ -105,13 +125,13 @@ export function MenuPage() {
             {cart.map((line) => (
               <span
                 key={line.product.id}
-                className="flex items-center gap-1 rounded-full bg-surface-muted px-3 py-1 text-sm"
+                className="flex items-center gap-1 rounded-full bg-surface-muted px-3 py-1 text-sm text-ink"
               >
-                {line.product.emoji} {line.product.name} × {line.quantity}
+                {line.product.name} × {line.quantity}
                 <button
                   type="button"
                   onClick={() => setQuantity(line.product.id, line.quantity - 1)}
-                  className="ml-1 h-6 w-6 min-h-0 min-w-0 rounded-full bg-slate-200 text-xs font-bold"
+                  className="ml-1 h-6 w-6 min-h-0 min-w-0 rounded-full bg-stone-200 text-xs font-bold"
                 >
                   −
                 </button>

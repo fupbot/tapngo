@@ -7,11 +7,14 @@ import { Logo } from "@/components/Logo"
 import { useIdleReset } from "@/hooks/useIdleReset"
 import { useLongPress } from "@/hooks/useLongPress"
 import { useSingleTouchGuard } from "@/hooks/useSingleTouchGuard"
+import { KIOSK_ID } from "@/lib/kiosk"
 import { useSession } from "@/state/SessionContext"
 
 // Idle reset only matters mid-order — not on the landing screen (already
 // reset) or the confirmation screen (which has its own short auto-return).
-const IDLE_RESET_PATHS = ["/menu", "/payment"]
+function idleResetApplies(pathname: string): boolean {
+  return pathname.startsWith("/menu") || pathname === "/payment"
+}
 
 export function Layout() {
   const location = useLocation()
@@ -21,7 +24,7 @@ export function Layout() {
 
   useSingleTouchGuard()
 
-  const idleEnabled = IDLE_RESET_PATHS.includes(location.pathname)
+  const idleEnabled = idleResetApplies(location.pathname)
   const { warning, secondsLeft, dismiss } = useIdleReset({
     enabled: idleEnabled,
     onExpire: () => {
@@ -34,14 +37,17 @@ export function Layout() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center justify-between border-b border-slate-100 bg-surface px-6 py-4">
-        <Logo />
+      <header className="flex items-center justify-between border-b border-stone-200 bg-surface px-6 py-4">
+        <div className="flex items-center gap-2">
+          <Logo />
+          <span className="text-xs text-ink-muted">{KIOSK_ID}</span>
+        </div>
         <div className="flex items-center gap-3">
           {admin && (
             <button
               type="button"
               onClick={() => setAdmin(null)}
-              className="rounded-full bg-brand-teal-light px-3 py-1 text-sm font-semibold text-brand-teal-dark"
+              className="rounded-full bg-brand-forest-light px-3 py-1 text-sm font-semibold text-brand-forest-dark"
             >
               {admin.username} · sign out
             </button>
